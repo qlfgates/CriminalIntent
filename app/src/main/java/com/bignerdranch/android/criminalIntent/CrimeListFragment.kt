@@ -20,7 +20,7 @@ class CrimeListFragment : Fragment(){
     private var _binding: FragmentCrimeListBinding? = null
     private val binding
         get() = checkNotNull(_binding){
-            "Cannot"
+            "Cannot access binding because it is null. Is the view Visible?"
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,6 +35,12 @@ class CrimeListFragment : Fragment(){
     ): View? {
         _binding =  FragmentCrimeListBinding.inflate(inflater,container,false)
         binding.crimeRecyclerView.layoutManager = LinearLayoutManager(context)
+
+        val crimes = crimeListViewModel.crimes
+        val adapter = CrimeListAdapter(crimes)
+
+        binding.crimeRecyclerView.adapter = adapter
+
         return binding.root
     }
 
