@@ -13,6 +13,8 @@ class CrimeDetailFragment : Fragment(){
 
     private lateinit var binding: FragmentCrimeDetailBinding
 
+    private var _binding: FragmentCrimeDetailBinding? = null
+
     private lateinit var crime: Crime
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,6 +34,7 @@ class CrimeDetailFragment : Fragment(){
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentCrimeDetailBinding.inflate(layoutInflater, container, false)
+        _binding = FragmentCrimeDetailBinding.inflate(layoutInflater, container, false)
         return binding.root
     }
 
@@ -48,6 +51,12 @@ class CrimeDetailFragment : Fragment(){
                 crime = crime.copy(isSolved = isChecked)
             }
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+//        binding = null
+        _binding = null
     }
 
 
