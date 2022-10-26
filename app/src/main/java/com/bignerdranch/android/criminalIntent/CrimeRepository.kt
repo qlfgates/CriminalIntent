@@ -1,8 +1,21 @@
 package com.bignerdranch.android.criminalIntent
 
 import android.content.Context
+import androidx.room.Room
+import com.bignerdranch.android.criminalIntent.database.CrimeDatabase
+import java.util.UUID
+
+private const val DATABASE_NAME = "crime-database"
 
 class CrimeRepository private constructor(context: Context) {
+
+    private val database: CrimeDatabase = Room.databaseBuilder(
+        context.applicationContext,
+        CrimeDatabase::class.java,
+        DATABASE_NAME).createFromAsset(DATABASE_NAME).build()
+
+    suspend fun getCrimes(): List<Crime> = database.crimeDao().getCrimes()
+    suspend fun getCrime(id: UUID): Crime = database.crimeDao().getCrimes(id)
 
     companion object{
 
