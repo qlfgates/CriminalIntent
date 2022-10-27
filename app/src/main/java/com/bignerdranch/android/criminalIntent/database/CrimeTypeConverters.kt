@@ -1,4 +1,4 @@
-package com.bignerdranch.android.criminalintent.database
+package com.bignerdranch.android.criminalIntent.database
 
 import androidx.room.TypeConverter
 import java.util.Date
@@ -8,6 +8,7 @@ class CrimeTypeConverters {
     fun fromDate(date: Date): Long {
         return date.time
     }
+
     @TypeConverter
     fun toDate(millisSinceEpoch: Long): Date {
         return Date(millisSinceEpoch)

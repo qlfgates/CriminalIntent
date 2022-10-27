@@ -1,8 +1,11 @@
 package com.bignerdranch.android.criminalIntent
 
+import androidx.room.Entity
 import androidx.room.PrimaryKey
-import java.util.*
+import java.util.UUID
+import java.util.Date
 
+@Entity
 data class Crime(@PrimaryKey val id: UUID,
                  val title: String,
                  val date: Date,

@@ -43,22 +43,9 @@ class CrimeListFragment : Fragment(){
         _binding =  FragmentCrimeListBinding.inflate(inflater,container,false)
         binding.crimeRecyclerView.layoutManager = LinearLayoutManager(context)
 
-        val crimes = crimeListViewModel.crimes
-        val adapter = CrimeListAdapter(crimes)
-
-        binding.crimeRecyclerView.adapter = adapter
-
         return binding.root
     }
 
-    override fun onStart() {
-        super.onStart()
-
-        job = viewLifecycleOwner.lifecycleScope.launch{
-            val crimes = crimeListViewModel.loadCrimes()
-            binding.crimeRecyclerView.adapter = CrimeListAdapter(crimes)
-        }
-    }
 
     override fun onStop() {
         super.onStop()
