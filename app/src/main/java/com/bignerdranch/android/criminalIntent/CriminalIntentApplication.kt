@@ -1,12 +1,12 @@
 package com.bignerdranch.android.criminalIntent
 
+import android.app.Application
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 
-class CriminalIntentApplication : AppCompatActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+class CriminalIntentApplication : Application() {
+    override fun onCreate() {
+        super.onCreate()
         CrimeRepository.initialize(this)
-//        setContentView(R.layout.activity_criminal_intent_application)
     }
 }

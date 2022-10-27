@@ -1,16 +1,16 @@
-package com.bignerdranch.android.criminalIntent.database
+package com.bignerdranch.android.criminalintent.database
 
 import androidx.room.Dao
 import androidx.room.Query
 import com.bignerdranch.android.criminalIntent.Crime
-import java.util.UUID
-
+import kotlinx.coroutines.flow.Flow
+import java.util.*
 
 @Dao
 interface CrimeDao {
     @Query("SELECT * FROM crime")
-    suspend fun getCrimes(): List<Crime>
+    suspend fun getCrimes(): Flow<List<Crime>>
 
     @Query("SELECT * FROM crime WHERE id=(:id)")
-    suspend fun getCrimes(id: UUID): Crime
+    suspend fun getCrime(id: UUID): Crime
 }
