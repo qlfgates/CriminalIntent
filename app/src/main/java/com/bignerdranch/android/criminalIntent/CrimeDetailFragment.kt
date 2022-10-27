@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.navArgs
 import com.bignerdranch.android.criminalIntent.databinding.FragmentCrimeDetailBinding
 import java.util.*
 
@@ -16,6 +17,8 @@ class CrimeDetailFragment : Fragment(){
     private var _binding: FragmentCrimeDetailBinding? = null
 
     private lateinit var crime: Crime
+
+    private val args: CrimeDetailFragmentArgs by navArgs()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
