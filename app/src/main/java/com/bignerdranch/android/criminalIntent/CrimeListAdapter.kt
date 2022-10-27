@@ -14,7 +14,7 @@ class CrimeListAdapter (private val crimes: List<Crime>): RecyclerView.Adapter<C
         val binding = ListItemCrimeBinding.inflate(inflater, parent, false)
         return CrimeHolder(binding)
     }
-
+중
     override fun onBindViewHolder(holder: CrimeHolder, position: Int) {
         val crime = crimes[position]
         holder.apply {
