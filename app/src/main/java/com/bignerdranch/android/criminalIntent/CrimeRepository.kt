@@ -20,6 +20,10 @@ class CrimeRepository private constructor(context: Context) {
     fun getCrimes(): Flow<List<Crime>> = database.crimeDao().getCrimes()
     suspend fun getCrime(id: UUID): Crime = database.crimeDao().getCrime(id)
 
+    suspend fun updateCrime(crime: Crime){
+        database.crimeDao().updateCrime(crime)
+    }
+
     companion object{
         private var INSTANCE: CrimeRepository? = null
 
