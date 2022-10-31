@@ -6,8 +6,9 @@ import java.util.UUID
 import java.util.Date
 
 @Entity
-data class Crime(@PrimaryKey val id: UUID,
-                 val title: String,
-                 val date: Date,
-                 val isSolved: Boolean) {
-}
+data class Crime(
+    @PrimaryKey val id: UUID,
+    val title: String,
+    val date: Date,
+    val isSolved: Boolean
+)

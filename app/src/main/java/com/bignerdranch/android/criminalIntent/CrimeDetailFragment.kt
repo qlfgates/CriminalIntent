@@ -1,6 +1,7 @@
 package com.bignerdranch.android.criminalIntent
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,6 +17,8 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.util.*
 
+private const val TAG = "CrimeDetailFragment"
+
 class CrimeDetailFragment : Fragment(){
 
     private var _binding: FragmentCrimeDetailBinding? = null
@@ -24,7 +27,6 @@ class CrimeDetailFragment : Fragment(){
             "Cannot access binding because it is null. Is the view visible?"
         }
 
-    private lateinit var crime: Crime
 
     private val args: CrimeDetailFragmentArgs by navArgs()
 
@@ -32,15 +34,16 @@ class CrimeDetailFragment : Fragment(){
         CrimeDetailViewModelFactory(args.crimeId)
     }
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        crime = Crime(
+        val crime = Crime(
             id = UUID.randomUUID(),
             title = "",
             date = Date(),
             isSolved = false
         )
+        Log.d(TAG, "The crime is: ${args.crimeId}")
     }
 
     override fun onCreateView(
@@ -71,7 +74,9 @@ class CrimeDetailFragment : Fragment(){
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED){
-                crimeDetailViewModel.crime.collect{ crime?.let { updateUi(it) }}
+                crimeDetailViewModel.crime.collect{ crime ->
+                    crime?.let { updateUi(it) }
+                }
             }
         }
     }
