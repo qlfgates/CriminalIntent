@@ -3,9 +3,8 @@ package com.bignerdranch.android.criminalIntent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import androidx.core.util.rangeTo
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -17,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.bignerdranch.android.criminalIntent.databinding.FragmentCrimeListBinding
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import java.util.*
 
 private const val TAG = "CrimeListFragment"
 
@@ -31,8 +31,10 @@ class CrimeListFragment : Fragment(){
             "Cannot access binding because it is null. Is the view Visible?"
         }
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
         Log.d(TAG, "Total crimes : {crimeListViewModel.crimes.size}")
     }
 
@@ -70,6 +72,39 @@ class CrimeListFragment : Fragment(){
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+
+    //Menu 표시
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.fragment_crime_list,menu)
+    }
+
+    //addCrime responding
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when(item.itemId){
+            R.id.new_crime -> {
+                showNewCrime()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    //newCrime 생성
+    private fun showNewCrime() {
+        TODO("Not yet implemented")
+        viewLifecycleOwner.lifecycleScope.launch{
+            val newCrime = Crime(
+                id = UUID.randomUUID(),
+                title = "",
+                date = Date(),
+                isSolved = false
+            )
+            crimeListViewModel.addCrime(newCrime)
+            findNavController().navigate(CrimeListFragmentDirections.showCrimeDetail(newCrime.id))
+        }
     }
 }
 
