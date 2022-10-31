@@ -7,6 +7,7 @@ import com.bignerdranch.android.criminalIntent.Crime
 import com.bignerdranch.android.criminalIntent.database.CrimeDao
 import com.bignerdranch.android.criminalIntent.database.CrimeTypeConverters
 
+
 @Database(entities = [Crime::class], version = 1)
 @TypeConverters(CrimeTypeConverters::class)
 abstract class CrimeDatabase : RoomDatabase() {

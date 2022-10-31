@@ -15,23 +15,26 @@ class CrimeRepository private constructor(context: Context) {
             context.applicationContext,
             CrimeDatabase::class.java,
             DATABASE_NAME
-        ).createFromAsset(DATABASE_NAME).build()
+        )
+        .createFromAsset(DATABASE_NAME)
+        .build()
 
     fun getCrimes(): Flow<List<Crime>> = database.crimeDao().getCrimes()
+
     suspend fun getCrime(id: UUID): Crime = database.crimeDao().getCrime(id)
 
-    companion object{
+    companion object {
         private var INSTANCE: CrimeRepository? = null
 
-        fun initialize(context: Context){
-            if (INSTANCE == null){
+        fun initialize(context: Context) {
+            if (INSTANCE == null) {
                 INSTANCE = CrimeRepository(context)
             }
         }
 
-        fun get(): CrimeRepository{
-            return INSTANCE ?:
-            throw IllegalStateException("CrimeRepository must be initialized")
+        fun get(): CrimeRepository {
+            return INSTANCE
+                ?: throw IllegalStateException("CrimeRepository must be initialized")
         }
     }
 }

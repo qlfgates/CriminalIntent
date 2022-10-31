@@ -6,6 +6,7 @@ import com.bignerdranch.android.criminalIntent.Crime
 import kotlinx.coroutines.flow.Flow
 import java.util.UUID
 
+
 @Dao
 interface CrimeDao {
     @Query("SELECT * FROM crime")

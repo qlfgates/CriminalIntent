@@ -1,43 +1,24 @@
 package com.bignerdranch.android.criminalIntent
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.room.Update
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.util.*
 
-class CrimeDetailViewModel(crimeId: UUID) : ViewModel() {
-
+class CrimeDetailViewModel : ViewModel() {
     private val crimeRepository = CrimeRepository.get()
 
-    private val _crime: MutableStateFlow<Crime?> = MutableStateFlow(null)
-    val crime: StateFlow<Crime?> = _crime.asStateFlow()
-
-    private val args: CrimeDetailFragmentArgs by navArgs()
-
-    private val crimeDetailViewModel: CrimeDetailViewModel by viewModels {
-        CrimeDetailViewModelFactory(args.crimeId)
-    }
+    private val _crimes: MutableStateFlow<List<Crime>> = MutableStateFlow(emptyList())
+    val crimes: StateFlow<List<Crime>>
+        get() = _crimes.asStateFlow()
 
     init {
         viewModelScope.launch {
-            _crime.value = crimeRepository.getCrime(crimeId)
+            crimeRepository.getCrimes().collect {
+                _crimes.value = it
+            }
         }
-    }
-
-    fun updateCrime(onUpdate: (Crime) -> Crime){
-        _crime.update { oldCrime -> oldCrime?.let { onUpdate(it) } }
-    }
-
-}
-
-class CrimeDetailViewModelFactory( private val crimeId: UUID) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return CrimeDetailViewModel(crimeId) as T
     }
 }
