@@ -11,6 +11,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bignerdranch.android.criminalIntent.databinding.FragmentCrimeDetailBinding
 import kotlinx.coroutines.flow.collect
@@ -59,13 +60,15 @@ class CrimeDetailFragment : Fragment(){
         super.onViewCreated(view, savedInstanceState)
 
         binding.apply {
-            crimeTitle.doOnTextChanged{ text, _, _, _ -> crimeDetailViewModel.updateCrime {
-                    oldCrime -> oldCrime.copy(title = text.toString())}}
+            crimeTitle.doOnTextChanged { text, _, _, _ ->
+                crimeDetailViewModel.updateCrime { oldCrime ->
+                    oldCrime.copy(title = text.toString())
+                }
+            }
             crimeDate.apply {
-//                text = crime.date.toString()
                 isEnabled = false
             }
-            crimeSolved.setOnCheckedChangeListener{ _, isChecked ->
+            crimeSolved.setOnCheckedChangeListener { _, isChecked ->
                 crimeDetailViewModel.updateCrime { oldCrime ->
                     oldCrime.copy(isSolved = isChecked)
                 }
@@ -81,19 +84,23 @@ class CrimeDetailFragment : Fragment(){
         }
     }
 
-    private fun updateUi(crime: Crime){
+    private fun updateUi(crime: Crime) {
         binding.apply {
-            if(crimeTitle.text.toString() != crime.title){
+            if (crimeTitle.text.toString() != crime.title) {
                 crimeTitle.setText(crime.title)
             }
             crimeDate.text = crime.date.toString()
+            crimeDate.setOnClickListener {
+                findNavController().navigate(
+                    CrimeDetailFragmentDirections.selectDate()
+                )
+            }
             crimeSolved.isChecked = crime.isSolved
         }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-//        binding = null
         _binding = null
     }
 }
