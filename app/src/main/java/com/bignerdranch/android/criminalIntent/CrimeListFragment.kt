@@ -94,7 +94,6 @@ class CrimeListFragment : Fragment(){
 
     //newCrime 생성
     private fun showNewCrime() {
-        TODO("Not yet implemented")
         viewLifecycleOwner.lifecycleScope.launch{
             val newCrime = Crime(
                 id = UUID.randomUUID(),
