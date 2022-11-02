@@ -54,11 +54,12 @@ class CrimeDetailFragment : Fragment(){
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        _binding = FragmentCrimeDetailBinding.inflate(inflater, container, false)
+        _binding =
+            FragmentCrimeDetailBinding.inflate(inflater, container, false)
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?){
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.apply {
@@ -67,9 +68,7 @@ class CrimeDetailFragment : Fragment(){
                     oldCrime.copy(title = text.toString())
                 }
             }
-//            crimeDate.apply {
-//                isEnabled = false
-//            }
+
             crimeSolved.setOnCheckedChangeListener { _, isChecked ->
                 crimeDetailViewModel.updateCrime { oldCrime ->
                     oldCrime.copy(isSolved = isChecked)
@@ -78,19 +77,20 @@ class CrimeDetailFragment : Fragment(){
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED){
-                crimeDetailViewModel.crime.collect{ crime ->
+            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                crimeDetailViewModel.crime.collect { crime ->
                     crime?.let { updateUi(it) }
                 }
             }
         }
-        
-        setFragmentResultListener(DatePickerFragment.REQUEST_KEY_DATE){
-            requestKey, bundle ->  val newDate =
+
+        setFragmentResultListener(
+            DatePickerFragment.REQUEST_KEY_DATE
+        ) { _, bundle ->
+            val newDate =
                 bundle.getSerializable(DatePickerFragment.BUNDLE_KEY_DATE) as Date
             crimeDetailViewModel.updateCrime { it.copy(date = newDate) }
         }
-
     }
 
     private fun updateUi(crime: Crime) {
@@ -101,9 +101,10 @@ class CrimeDetailFragment : Fragment(){
             crimeDate.text = crime.date.toString()
             crimeDate.setOnClickListener {
                 findNavController().navigate(
-                    CrimeDetailFragmentDirections.selectDate()
+                    CrimeDetailFragmentDirections.selectDate(crime.date)
                 )
             }
+
             crimeSolved.isChecked = crime.isSolved
         }
     }

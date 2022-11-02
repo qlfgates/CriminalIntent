@@ -35,15 +35,11 @@ class CrimeListFragment : Fragment(){
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
-        Log.d(TAG, "Total crimes : {crimeListViewModel.crimes.size}")
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        _binding =  FragmentCrimeListBinding.inflate(inflater,container,false)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        _binding = FragmentCrimeListBinding.inflate(inflater, container, false)
+
         binding.crimeRecyclerView.layoutManager = LinearLayoutManager(context)
 
         return binding.root
@@ -83,7 +79,7 @@ class CrimeListFragment : Fragment(){
 
     //addCrime responding
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when(item.itemId){
+        return when (item.itemId) {
             R.id.new_crime -> {
                 showNewCrime()
                 true
@@ -94,8 +90,7 @@ class CrimeListFragment : Fragment(){
 
     //newCrime 생성
     private fun showNewCrime() {
-        TODO("Not yet implemented")
-        viewLifecycleOwner.lifecycleScope.launch{
+        viewLifecycleOwner.lifecycleScope.launch {
             val newCrime = Crime(
                 id = UUID.randomUUID(),
                 title = "",
