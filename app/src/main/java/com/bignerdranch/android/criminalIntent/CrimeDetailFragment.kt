@@ -1,7 +1,9 @@
 package com.bignerdranch.android.criminalIntent
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.provider.ContactsContract
 import android.text.format.DateFormat
 import android.text.format.DateFormat.format
 import android.util.Log
@@ -9,6 +11,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.DatePicker
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResultListener
@@ -20,6 +23,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bignerdranch.android.criminalIntent.databinding.FragmentCrimeDetailBinding
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.selects.select
 import java.util.*
 
 private const val TAG = "CrimeDetailFragment"
@@ -38,6 +42,10 @@ class CrimeDetailFragment : Fragment(){
 
     private val crimeDetailViewModel: CrimeDetailViewModel by viewModels {
         CrimeDetailViewModelFactory(args.crimeId)
+    }
+
+    private val selectSuspect = registerForActivityResult(ActivityResultContracts.PickContact()){
+        uri: Uri? -> uri?.let { parseContractSelection(it) }
     }
 
 
@@ -76,6 +84,10 @@ class CrimeDetailFragment : Fragment(){
                 crimeDetailViewModel.updateCrime { oldCrime ->
                     oldCrime.copy(isSolved = isChecked)
                 }
+            }
+
+            crimeSuspect.setOnClickListener {
+                selectSuspect.launch(null)
             }
         }
 
@@ -116,8 +128,14 @@ class CrimeDetailFragment : Fragment(){
                     putExtra(Intent.EXTRA_TEXT, getCrimeReport(crime))
                     putExtra(Intent.EXTRA_SUBJECT, getString(R.string.crime_report_subject))
                 }
+
+                startActivity(reportIntent)
                 val chooserIntent = Intent.createChooser(reportIntent, getString(R.string.send_report))
                 startActivity(chooserIntent)
+            }
+
+            crimeSuspect.text = crime.suspect.ifEmpty {
+                getString(R.string.crime_suspect_text)
             }
         }
     }
@@ -135,6 +153,21 @@ class CrimeDetailFragment : Fragment(){
             getString(R.string.crime_report_suspect, crime.suspect)
         }
         return getString(R.string.crime_report, crime.title, dateString, solvedString, suspectText)
+    }
+
+    //연락처 선택(choose suspect에 연락처 이름 뜸)
+    private fun parseContractSelection(contractUri: Uri){
+        val queryFields = arrayOf(ContactsContract.Contacts.DISPLAY_NAME)
+        val queryCursor = requireActivity().contentResolver.query(contractUri, queryFields, null, null, null)
+
+        queryCursor?.use { cursor ->
+            if (cursor.moveToFirst()){
+                val suspect = cursor.getString(0)
+                crimeDetailViewModel.updateCrime {
+                    oldCrime -> oldCrime.copy(suspect = suspect)
+                }
+            }
+        }
     }
 
 
