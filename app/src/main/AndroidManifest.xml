@@ -21,5 +21,11 @@
         </activity>
 
     </application>
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.PICK" />
+            <data android:mimeType="vnd.android.cursor.dir/contact" />
+        </intent>
+    </queries>
 
 </manifest>
