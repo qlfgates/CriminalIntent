@@ -3,7 +3,7 @@ package com.bignerdranch.android.criminalIntent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 
-//chapter16
+//chapter17
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -102,5 +102,3 @@ class CrimeListFragment : Fragment(){
         }
     }
 }
-
-

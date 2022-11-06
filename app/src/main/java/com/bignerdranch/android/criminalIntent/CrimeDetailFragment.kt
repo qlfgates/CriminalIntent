@@ -3,6 +3,7 @@ package com.bignerdranch.android.criminalIntent
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
+import android.graphics.Picture
 import android.net.Uri
 import android.os.Bundle
 import android.provider.ContactsContract
@@ -14,6 +15,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.DatePicker
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.FileProvider
+import androidx.core.view.doOnLayout
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResultListener
@@ -26,6 +29,7 @@ import androidx.navigation.fragment.navArgs
 import com.bignerdranch.android.criminalIntent.databinding.FragmentCrimeDetailBinding
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.selects.select
+import java.io.File
 import java.util.*
 
 private const val TAG = "CrimeDetailFragment"
@@ -49,6 +53,13 @@ class CrimeDetailFragment : Fragment(){
     private val selectSuspect = registerForActivityResult(ActivityResultContracts.PickContact()){
         uri: Uri? -> uri?.let { parseContractSelection(it) }
     }
+
+    private val takePhoto = registerForActivityResult(ActivityResultContracts.TakePicture()) { didTakePhoto: Boolean ->
+        if (didTakePhoto && photoName != null) {
+            crimeDetailViewModel.updateCrime { oldCrime -> oldCrime.copy(photoFileName = photoName) }
+        }
+    }
+    private var photoName: String? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -95,6 +106,18 @@ class CrimeDetailFragment : Fragment(){
             val selectSuspectIntent = selectSuspect.contract.createIntent(requireContext(),null)
 
             crimeSuspect.isEnabled = canResolveIntent(selectSuspectIntent)
+
+            // 사진찍기 listener 추가
+            crimeCamera.setOnClickListener{
+                val photoName = "IMG_${Date()}.JPG"
+                val photoFile = File(requireContext().applicationContext.filesDir, photoName)
+                val photoUri = FileProvider.getUriForFile(requireContext(),"com.bignerdranch.android.criminalIntent.fileprofider", photoFile)
+
+                takePhoto.launch(photoUri)
+            }
+
+            val captureImageIntent = takePhoto.contract.createIntent(requireContext(), null)
+            crimeCamera.isEnabled = canResolveIntent(captureImageIntent)
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -144,6 +167,7 @@ class CrimeDetailFragment : Fragment(){
                 getString(R.string.crime_suspect_text)
             }
         }
+        updatePhoto(crime.photoFileName)
     }
 
     private fun getCrimeReport(crime: Crime): String {
@@ -185,6 +209,24 @@ class CrimeDetailFragment : Fragment(){
         val resolvedActivity: ResolveInfo? = packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY)
 
         return resolvedActivity != null
+    }
+
+    private fun updatePhoto(photoFileName: String?){
+        if(binding.crimePhoto.tag != photoFileName){
+            val photoFile = photoFileName?.let {
+                File(requireContext().applicationContext.filesDir, it)
+            }
+
+            if(photoFile?.exists() == true){
+                binding.crimePhoto.doOnLayout { measuredView -> val scaledBitmap = getScaledBitmap(
+                    photoFile.path, measuredView.width, measuredView.height)
+                binding.crimePhoto.setImageBitmap(scaledBitmap)}
+                binding.crimePhoto.tag = photoFileName
+            } else{
+                binding.crimePhoto.setImageBitmap(null)
+                binding.crimePhoto.tag = null
+            }
+        }
     }
 
 
