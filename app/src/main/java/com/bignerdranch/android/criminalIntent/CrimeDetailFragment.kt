@@ -51,7 +51,7 @@ class CrimeDetailFragment : Fragment(){
     }
 
     private val selectSuspect = registerForActivityResult(ActivityResultContracts.PickContact()){
-        uri: Uri? -> uri?.let { parseContractSelection(it) }
+            uri: Uri? -> uri?.let { parseContractSelection(it) }
     }
 
     private val takePhoto = registerForActivityResult(ActivityResultContracts.TakePicture()) { didTakePhoto: Boolean ->
@@ -60,18 +60,6 @@ class CrimeDetailFragment : Fragment(){
         }
     }
     private var photoName: String? = null
-
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        val crime = Crime(
-            id = UUID.randomUUID(),
-            title = "",
-            date = Date(),
-            isSolved = false
-        )
-        Log.d(TAG, "The crime is: ${args.crimeId}")
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -194,7 +182,7 @@ class CrimeDetailFragment : Fragment(){
             if (cursor.moveToFirst()){
                 val suspect = cursor.getString(0)
                 crimeDetailViewModel.updateCrime {
-                    oldCrime -> oldCrime.copy(suspect = suspect)
+                        oldCrime -> oldCrime.copy(suspect = suspect)
                 }
             }
         }
@@ -220,7 +208,7 @@ class CrimeDetailFragment : Fragment(){
             if(photoFile?.exists() == true){
                 binding.crimePhoto.doOnLayout { measuredView -> val scaledBitmap = getScaledBitmap(
                     photoFile.path, measuredView.width, measuredView.height)
-                binding.crimePhoto.setImageBitmap(scaledBitmap)}
+                    binding.crimePhoto.setImageBitmap(scaledBitmap)}
                 binding.crimePhoto.tag = photoFileName
             } else{
                 binding.crimePhoto.setImageBitmap(null)

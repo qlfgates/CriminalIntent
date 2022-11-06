@@ -4,8 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import kotlin.math.roundToInt
 
-class PictureUtils {
-    fun getScaledBitmap(path:String, desWidth: Int, desHeight: Int): Bitmap{
+fun getScaledBitmap(path:String, desWidth: Int, desHeight: Int): Bitmap{
         val options = BitmapFactory.Options()
         options.inJustDecodeBounds = true
         BitmapFactory.decodeFile(path, options)
@@ -26,4 +25,3 @@ class PictureUtils {
             inSampleSize = sampleSize
         })
     }
-}
