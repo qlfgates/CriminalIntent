@@ -14,8 +14,7 @@ private const val DATABASE_NAME = "crime-database"
 
 class CrimeRepository private constructor(context: Context, private val coroutineScope: CoroutineScope = GlobalScope) {
 
-    private val database: CrimeDatabase = Room
-        .databaseBuilder(
+    private val database: CrimeDatabase = Room.databaseBuilder(
             context.applicationContext,
             CrimeDatabase::class.java,
             DATABASE_NAME
