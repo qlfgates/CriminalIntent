@@ -7,12 +7,9 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.ContactsContract
 import android.text.format.DateFormat
-import android.text.format.DateFormat.format
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.DatePicker
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.FileProvider
 import androidx.core.view.doOnLayout
@@ -27,7 +24,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bignerdranch.android.criminalIntent.databinding.FragmentCrimeDetailBinding
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.selects.select
 import java.io.File
 import java.util.*
 
@@ -66,20 +62,21 @@ class CrimeDetailFragment : Fragment(){
         }
     }
 
+
     //chapter17. 사진파일 이름
-    private val photoName: String? = null
+    private var photoName: String? = null
 
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        val crime = Crime(
-            id = UUID.randomUUID(),
-            title = "",
-            date = Date(),
-            isSolved = false
-        )
-        Log.d(TAG, "The crime is: ${args.crimeId}")
-    }
+//    override fun onCreate(savedInstanceState: Bundle?) {
+//        super.onCreate(savedInstanceState)
+//        val crime = Crime(
+//            id = UUID.randomUUID(),
+//            title = "",
+//            date = Date(),
+//            isSolved = false
+//        )
+//        Log.d(TAG, "The crime is: ${args.crimeId}")
+//    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -117,7 +114,7 @@ class CrimeDetailFragment : Fragment(){
 
             // chapter17. 사진파일 이름, 사진파일, 사진파일 Uri 지정한 다음에 photoUri를 intent에 넣어서 takePhoto 함수 launch
             crimeCamera.setOnClickListener{
-                val photoName = "IMG_${Date()}.JPG"
+                photoName = "IMG_${Date()}.JPG"
                 val photoFile = File(requireContext().applicationContext.filesDir, photoName)
                 val photoUri = FileProvider.getUriForFile(requireContext(), "com.bignerdranch.android.criminalIntent.fileprovider", photoFile)
 
@@ -135,7 +132,7 @@ class CrimeDetailFragment : Fragment(){
             // 이부분 확인 필요
 //            val captureImageIntent = takePhoto.contract.createIntent(requireContext(), null)
 //            crimeCamera.isEnabled = canResolveIntent(captureImageIntent)
-        }
+         }
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
