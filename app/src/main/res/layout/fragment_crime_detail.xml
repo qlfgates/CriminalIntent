@@ -5,6 +5,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_margin="16dp">
+    <ImageView
+        android:id="@+id/crime_photo"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:scaleType="centerInside"
+        android:background="@color/white"/>
+    <ImageButton
+        android:id="@+id/crime_camera"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_baseline_photo_camera_24"
+        android:text="takePhoto"/>
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

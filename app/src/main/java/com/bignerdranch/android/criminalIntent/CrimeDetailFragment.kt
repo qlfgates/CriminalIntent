@@ -14,6 +14,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.DatePicker
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.FileProvider
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResultListener
@@ -26,6 +27,7 @@ import androidx.navigation.fragment.navArgs
 import com.bignerdranch.android.criminalIntent.databinding.FragmentCrimeDetailBinding
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.selects.select
+import java.io.File
 import java.util.*
 
 private const val TAG = "CrimeDetailFragment"
@@ -48,6 +50,11 @@ class CrimeDetailFragment : Fragment(){
 
     private val selectSuspect = registerForActivityResult(ActivityResultContracts.PickContact()){
         uri: Uri? -> uri?.let { parseContractSelection(it) }
+    }
+
+    private val takePhoto = registerForActivityResult(ActivityResultContracts.TakePicture()){
+        didTakePhoto: Boolean ->
+        // 결과값 처리
     }
 
 
@@ -95,6 +102,14 @@ class CrimeDetailFragment : Fragment(){
             val selectSuspectIntent = selectSuspect.contract.createIntent(requireContext(),null)
 
             crimeSuspect.isEnabled = canResolveIntent(selectSuspectIntent)
+
+            crimeCamera.setOnClickListener{
+                val photoName = "IMG_${Date()}.JPG"
+                val photoFile = File(requireContext().applicationContext.filesDir, photoName)
+                val photoUri = FileProvider.getUriForFile(requireContext(), "com.bignerdranch.android.criminalIntent.fileprovider", photoFile)
+
+                takePhoto.launch(photoUri)
+            }
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
