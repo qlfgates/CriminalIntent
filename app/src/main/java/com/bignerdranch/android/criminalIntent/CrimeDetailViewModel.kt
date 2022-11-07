@@ -10,8 +10,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
 
-class CrimeDetailViewModel(crimeId:UUID): ViewModel() {
-
+class CrimeDetailViewModel(crimeId: UUID) : ViewModel() {
     private val crimeRepository = CrimeRepository.get()
 
     private val _crime: MutableStateFlow<Crime?> = MutableStateFlow(null)
@@ -35,7 +34,8 @@ class CrimeDetailViewModel(crimeId:UUID): ViewModel() {
     }
 }
 
-class CrimeDetailViewModelFactory(private val crimeId: UUID) : ViewModelProvider.Factory {
+class CrimeDetailViewModelFactory(
+    private val crimeId: UUID) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return CrimeDetailViewModel(crimeId) as T
     }

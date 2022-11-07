@@ -9,11 +9,11 @@ import com.bignerdranch.android.criminalIntent.databinding.ListItemCrimeBinding
 import java.util.*
 
 
-class CrimeHolder(private val binding: ListItemCrimeBinding) : RecyclerView.ViewHolder(binding.root) {
+class CrimeHolder(
+    private val binding: ListItemCrimeBinding) : RecyclerView.ViewHolder(binding.root) {
     fun bind(crime: Crime, onCrimeClicked: (crimeId: UUID) -> Unit) {
         binding.crimeTitle.text = crime.title
         binding.crimeDate.text = crime.date.toString()
-
         binding.root.setOnClickListener {
             onCrimeClicked(crime.id)
         }
@@ -26,10 +26,8 @@ class CrimeHolder(private val binding: ListItemCrimeBinding) : RecyclerView.View
     }
 }
 
-
-
-class CrimeListAdapter(private val crimes: List<Crime>, private val onCrimeClicked: (crimeId: UUID) -> Unit) : RecyclerView.Adapter<CrimeHolder>() {
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CrimeHolder {
+class CrimeListAdapter(private val crimes: List<Crime>,private val onCrimeClicked: (crimeId: UUID) -> Unit) : RecyclerView.Adapter<CrimeHolder>() {
+    override fun onCreateViewHolder(parent: ViewGroup,viewType: Int): CrimeHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding = ListItemCrimeBinding.inflate(inflater, parent, false)
         return CrimeHolder(binding)
@@ -42,6 +40,7 @@ class CrimeListAdapter(private val crimes: List<Crime>, private val onCrimeClick
 
     override fun getItemCount() = crimes.size
 }
+
 
 
 

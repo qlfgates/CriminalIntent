@@ -3,17 +3,13 @@ package com.bignerdranch.android.criminalIntent
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
-import android.graphics.Picture
 import android.net.Uri
 import android.os.Bundle
 import android.provider.ContactsContract
 import android.text.format.DateFormat
-import android.text.format.DateFormat.format
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.DatePicker
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.FileProvider
 import androidx.core.view.doOnLayout
@@ -28,9 +24,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bignerdranch.android.criminalIntent.databinding.FragmentCrimeDetailBinding
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.selects.select
 import java.io.File
-import java.util.*
+import java.util.Date
 
 private const val TAG = "CrimeDetailFragment"
 private const val DATE_FORMAT = "EEE, MMM, dd"
@@ -50,15 +45,19 @@ class CrimeDetailFragment : Fragment(){
         CrimeDetailViewModelFactory(args.crimeId)
     }
 
-    private val selectSuspect = registerForActivityResult(ActivityResultContracts.PickContact()){
-            uri: Uri? -> uri?.let { parseContractSelection(it) }
+    private val selectSuspect = registerForActivityResult(ActivityResultContracts.PickContact()) { uri: Uri? -> uri?.let { parseContactSelection(it) }
     }
 
-    private val takePhoto = registerForActivityResult(ActivityResultContracts.TakePicture()) { didTakePhoto: Boolean ->
+    private val takePhoto = registerForActivityResult(
+        ActivityResultContracts.TakePicture()
+    ) { didTakePhoto: Boolean ->
         if (didTakePhoto && photoName != null) {
-            crimeDetailViewModel.updateCrime { oldCrime -> oldCrime.copy(photoFileName = photoName) }
+            crimeDetailViewModel.updateCrime { oldCrime ->
+                oldCrime.copy(photoFileName = photoName)
+            }
         }
     }
+
     private var photoName: String? = null
 
     override fun onCreateView(
@@ -87,24 +86,20 @@ class CrimeDetailFragment : Fragment(){
                 }
             }
 
-            crimeSuspect.setOnClickListener {
-                selectSuspect.launch(null)
-            }
-
             val selectSuspectIntent = selectSuspect.contract.createIntent(requireContext(),null)
-
             crimeSuspect.isEnabled = canResolveIntent(selectSuspectIntent)
 
             // 사진찍기 listener 추가
-            crimeCamera.setOnClickListener{
-                val photoName = "IMG_${Date()}.JPG"
+            crimeCamera.setOnClickListener {
+                photoName = "IMG_${Date()}.JPG"
                 val photoFile = File(requireContext().applicationContext.filesDir, photoName)
-                val photoUri = FileProvider.getUriForFile(requireContext(),"com.bignerdranch.android.criminalIntent.fileprofider", photoFile)
+                val photoUri = FileProvider.getUriForFile(
+                    requireContext(),"com.bignerdranch.android.criminalIntent.fileprovider",photoFile)
 
                 takePhoto.launch(photoUri)
             }
 
-            val captureImageIntent = takePhoto.contract.createIntent(requireContext(), null)
+            val captureImageIntent = takePhoto.contract.createIntent(requireContext(),null)
             crimeCamera.isEnabled = canResolveIntent(captureImageIntent)
         }
 
@@ -143,11 +138,9 @@ class CrimeDetailFragment : Fragment(){
                 val reportIntent = Intent(Intent.ACTION_SEND).apply {
                     type = "text/plain"
                     putExtra(Intent.EXTRA_TEXT, getCrimeReport(crime))
-                    putExtra(Intent.EXTRA_SUBJECT, getString(R.string.crime_report_subject))
+                    putExtra(Intent.EXTRA_SUBJECT,getString(R.string.crime_report_subject))
                 }
-
-                startActivity(reportIntent)
-                val chooserIntent = Intent.createChooser(reportIntent, getString(R.string.send_report))
+                val chooserIntent = Intent.createChooser(reportIntent,getString(R.string.send_report))
                 startActivity(chooserIntent)
             }
 
@@ -164,53 +157,52 @@ class CrimeDetailFragment : Fragment(){
         } else {
             getString(R.string.crime_report_unsolved)
         }
+
         val dateString = DateFormat.format(DATE_FORMAT, crime.date).toString()
         val suspectText = if (crime.suspect.isBlank()) {
             getString(R.string.crime_report_no_suspect)
         } else {
             getString(R.string.crime_report_suspect, crime.suspect)
         }
-        return getString(R.string.crime_report, crime.title, dateString, solvedString, suspectText)
+
+        return getString(R.string.crime_report,crime.title, dateString, solvedString, suspectText)
     }
 
     //연락처 선택(choose suspect에 연락처 이름 뜸)
-    private fun parseContractSelection(contractUri: Uri){
+    private fun parseContactSelection(contactUri: Uri) {
         val queryFields = arrayOf(ContactsContract.Contacts.DISPLAY_NAME)
-        val queryCursor = requireActivity().contentResolver.query(contractUri, queryFields, null, null, null)
+        val queryCursor = requireActivity().contentResolver.query(contactUri, queryFields, null, null, null)
 
         queryCursor?.use { cursor ->
-            if (cursor.moveToFirst()){
+            if (cursor.moveToFirst()) {
                 val suspect = cursor.getString(0)
-                crimeDetailViewModel.updateCrime {
-                        oldCrime -> oldCrime.copy(suspect = suspect)
+                crimeDetailViewModel.updateCrime { oldCrime ->
+                    oldCrime.copy(suspect = suspect)
                 }
             }
         }
     }
 
-    private fun canResolveIntent(intent: Intent): Boolean{
-
-        //연락처 선택기능 삭제 코드(주석)
-//        intent.addCategory(Intent.CATEGORY_HOME)
-
+    private fun canResolveIntent(intent: Intent): Boolean {
         val packageManager: PackageManager = requireActivity().packageManager
-        val resolvedActivity: ResolveInfo? = packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY)
-
+        val resolvedActivity: ResolveInfo? =
+            packageManager.resolveActivity(intent,PackageManager.MATCH_DEFAULT_ONLY)
         return resolvedActivity != null
     }
 
-    private fun updatePhoto(photoFileName: String?){
-        if(binding.crimePhoto.tag != photoFileName){
+    private fun updatePhoto(photoFileName: String?) {
+        if (binding.crimePhoto.tag != photoFileName) {
             val photoFile = photoFileName?.let {
                 File(requireContext().applicationContext.filesDir, it)
             }
 
-            if(photoFile?.exists() == true){
-                binding.crimePhoto.doOnLayout { measuredView -> val scaledBitmap = getScaledBitmap(
-                    photoFile.path, measuredView.width, measuredView.height)
-                    binding.crimePhoto.setImageBitmap(scaledBitmap)}
-                binding.crimePhoto.tag = photoFileName
-            } else{
+            if (photoFile?.exists() == true) {
+                binding.crimePhoto.doOnLayout { measuredView ->
+                    val scaledBitmap = getScaledBitmap(photoFile.path,measuredView.width,measuredView.height)
+                    binding.crimePhoto.setImageBitmap(scaledBitmap)
+                    binding.crimePhoto.tag = photoFileName
+                }
+            } else {
                 binding.crimePhoto.setImageBitmap(null)
                 binding.crimePhoto.tag = null
             }
