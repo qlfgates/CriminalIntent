@@ -15,6 +15,7 @@ import android.view.ViewGroup
 import android.widget.DatePicker
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.FileProvider
+import androidx.core.view.doOnLayout
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResultListener
@@ -52,10 +53,21 @@ class CrimeDetailFragment : Fragment(){
         uri: Uri? -> uri?.let { parseContractSelection(it) }
     }
 
+    //chapter17. 사진찍기 함수
+    //takePicture함수를 call해서 result로 받아오는데,
+    //photo가 존재하고, photoName이 존재하면, viewModel을 업데이트하기
     private val takePhoto = registerForActivityResult(ActivityResultContracts.TakePicture()){
         didTakePhoto: Boolean ->
         // 결과값 처리
+        if(didTakePhoto && photoName!=null){
+            crimeDetailViewModel.updateCrime {
+                oldCrime -> oldCrime.copy(photoFileName = photoName)
+            }
+        }
     }
+
+    //chapter17. 사진파일 이름
+    private val photoName: String? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -103,13 +115,26 @@ class CrimeDetailFragment : Fragment(){
 
             crimeSuspect.isEnabled = canResolveIntent(selectSuspectIntent)
 
+            // chapter17. 사진파일 이름, 사진파일, 사진파일 Uri 지정한 다음에 photoUri를 intent에 넣어서 takePhoto 함수 launch
             crimeCamera.setOnClickListener{
                 val photoName = "IMG_${Date()}.JPG"
                 val photoFile = File(requireContext().applicationContext.filesDir, photoName)
                 val photoUri = FileProvider.getUriForFile(requireContext(), "com.bignerdranch.android.criminalIntent.fileprovider", photoFile)
 
                 takePhoto.launch(photoUri)
+
+                // chapter17. takePhoto에서 image(사진)를 가져와서 화면에 표시
+                // query declaration 필요
+                // 이부분 확인 필요
+                val captureImageIntent = takePhoto.contract.createIntent(requireContext(), null)
+                crimeCamera.isEnabled = canResolveIntent(captureImageIntent)
             }
+
+            // chapter17. takePhoto에서 image(사진)를 가져와서 화면에 표시
+            // query declaration 필요
+            // 이부분 확인 필요
+//            val captureImageIntent = takePhoto.contract.createIntent(requireContext(), null)
+//            crimeCamera.isEnabled = canResolveIntent(captureImageIntent)
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -158,6 +183,7 @@ class CrimeDetailFragment : Fragment(){
             crimeSuspect.text = crime.suspect.ifEmpty {
                 getString(R.string.crime_suspect_text)
             }
+            updatePhoto(crime.photoFileName)
         }
     }
 
@@ -200,6 +226,25 @@ class CrimeDetailFragment : Fragment(){
         val resolvedActivity: ResolveInfo? = packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY)
 
         return resolvedActivity != null
+    }
+
+    // chapter17. 사진크기 scaling 함수 호출
+    private fun updatePhoto(photoFileName: String?){
+        if(binding.crimePhoto.tag != photoFileName){
+            val photoFile = photoFileName?.let {
+                File(requireContext().applicationContext.filesDir, it)
+            }
+            if (photoFile?.exists() == true){
+                binding.crimePhoto.doOnLayout{
+                    measuredView -> val scaledBitmap = getScaledBitmap(photoFile.path, measuredView.width, measuredView.height)
+                    binding.crimePhoto.setImageBitmap(scaledBitmap)
+                    binding.crimePhoto.tag = photoFileName
+                }
+            } else{
+                binding.crimePhoto.setImageBitmap(null)
+                binding.crimePhoto.tag = null
+            }
+        }
     }
 
 
