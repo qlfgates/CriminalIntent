@@ -53,7 +53,7 @@ class CrimeDetailFragment : Fragment(){
     //takePicture함수를 call해서 result로 받아오는데,
     //photo가 존재하고, photoName이 존재하면, viewModel을 업데이트하기
     private val takePhoto = registerForActivityResult(ActivityResultContracts.TakePicture()){
-        didTakePhoto: Boolean ->
+        didTakePhoto ->
         // 결과값 처리
         if(didTakePhoto && photoName!=null){
             crimeDetailViewModel.updateCrime {
@@ -114,24 +114,20 @@ class CrimeDetailFragment : Fragment(){
 
             // chapter17. 사진파일 이름, 사진파일, 사진파일 Uri 지정한 다음에 photoUri를 intent에 넣어서 takePhoto 함수 launch
             crimeCamera.setOnClickListener{
-                photoName = "IMG_${Date()}.JPG"
+                val photoName = "IMG_${Date()}.JPG"
                 val photoFile = File(requireContext().applicationContext.filesDir, photoName)
                 val photoUri = FileProvider.getUriForFile(requireContext(), "com.bignerdranch.android.criminalIntent.fileprovider", photoFile)
 
                 takePhoto.launch(photoUri)
 
-                // chapter17. takePhoto에서 image(사진)를 가져와서 화면에 표시
-                // query declaration 필요
-                // 이부분 확인 필요
-                val captureImageIntent = takePhoto.contract.createIntent(requireContext(), null)
-                crimeCamera.isEnabled = canResolveIntent(captureImageIntent)
             }
 
             // chapter17. takePhoto에서 image(사진)를 가져와서 화면에 표시
-            // query declaration 필요
+            // query declaration(androidManifest.xml)
             // 이부분 확인 필요
-//            val captureImageIntent = takePhoto.contract.createIntent(requireContext(), null)
-//            crimeCamera.isEnabled = canResolveIntent(captureImageIntent)
+            val captureImageIntent = takePhoto.contract.createIntent(requireContext(), null)
+            crimeCamera.isEnabled = canResolveIntent(captureImageIntent)
+
          }
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -214,14 +210,9 @@ class CrimeDetailFragment : Fragment(){
         }
     }
 
-    private fun canResolveIntent(intent: Intent): Boolean{
-
-        //연락처 선택기능 삭제 코드(주석)
-//        intent.addCategory(Intent.CATEGORY_HOME)
-
+    private fun canResolveIntent(intent: Intent): Boolean {
         val packageManager: PackageManager = requireActivity().packageManager
         val resolvedActivity: ResolveInfo? = packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY)
-
         return resolvedActivity != null
     }
 
