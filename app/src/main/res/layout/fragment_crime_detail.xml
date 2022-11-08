@@ -25,7 +25,8 @@
                 android:id="@+id/crime_camera"
                 android:layout_width="80dp"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_baseline_photo_camera_24" />
+                android:src="@drawable/ic_baseline_photo_camera_24"
+                android:contentDescription="@string/crime_photo_button_description"/>
         </LinearLayout>
         <LinearLayout
             android:layout_width="0dp"
