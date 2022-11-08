@@ -109,7 +109,6 @@ class CrimeDetailFragment : Fragment(){
             }
 
             val selectSuspectIntent = selectSuspect.contract.createIntent(requireContext(),null)
-
             crimeSuspect.isEnabled = canResolveIntent(selectSuspectIntent)
 
             // chapter17. 사진파일 이름, 사진파일, 사진파일 Uri 지정한 다음에 photoUri를 intent에 넣어서 takePhoto 함수 launch
@@ -119,15 +118,12 @@ class CrimeDetailFragment : Fragment(){
                 val photoUri = FileProvider.getUriForFile(requireContext(), "com.bignerdranch.android.criminalIntent.fileprovider", photoFile)
 
                 takePhoto.launch(photoUri)
-
             }
 
             // chapter17. takePhoto에서 image(사진)를 가져와서 화면에 표시
             // query declaration(androidManifest.xml)
-            // 이부분 확인 필요
             val captureImageIntent = takePhoto.contract.createIntent(requireContext(), null)
             crimeCamera.isEnabled = canResolveIntent(captureImageIntent)
-
          }
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -215,6 +211,8 @@ class CrimeDetailFragment : Fragment(){
         val resolvedActivity: ResolveInfo? = packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY)
         return resolvedActivity != null
     }
+
+
 
     // chapter17. 사진크기 scaling 함수 호출
     private fun updatePhoto(photoFileName: String?){
