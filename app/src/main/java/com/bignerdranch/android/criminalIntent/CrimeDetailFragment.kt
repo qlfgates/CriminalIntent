@@ -215,6 +215,8 @@ class CrimeDetailFragment : Fragment(){
 
 
     // chapter17. 사진크기 scaling 함수 호출
+    //chapter19. 설명을 동적으로(상황에 따라) setting
+    // : 사진이 존재하는 경우, contentDescription을 설정
     private fun updatePhoto(photoFileName: String?){
         if(binding.crimePhoto.tag != photoFileName){
             val photoFile = photoFileName?.let {
@@ -225,14 +227,15 @@ class CrimeDetailFragment : Fragment(){
                     measuredView -> val scaledBitmap = getScaledBitmap(photoFile.path, measuredView.width, measuredView.height)
                     binding.crimePhoto.setImageBitmap(scaledBitmap)
                     binding.crimePhoto.tag = photoFileName
+                    binding.crimePhoto.contentDescription = getString(R.string.crime_photo_image_description)
                 }
             } else{
                 binding.crimePhoto.setImageBitmap(null)
                 binding.crimePhoto.tag = null
+                binding.crimePhoto.contentDescription = getString(R.string.crime_photo_no_image_description)
             }
         }
     }
-
 
     override fun onDestroyView() {
         super.onDestroyView()
